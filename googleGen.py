@@ -19,6 +19,7 @@ def get_image(url):
     if response.status_code == 200:
         return response.content
     else:
+        print(f"Error: {response.status_code}")
         return None
 
 def main():
@@ -55,7 +56,7 @@ def main():
     # Select a random question
     question = random.choice(questions)
 
-    # Build the API endpoint URL
+    # Build the API endpoint URL for google Books API
     url = f"https://www.googleapis.com/books/v1/volumes?q={question}&key={api_key}"
 
     # Send the GET request
@@ -66,7 +67,9 @@ def main():
 
     if response.status_code == 200:
         data = response.json()
+        # items is a field of dictionaries returned by the json format.
         books = data['items']
+        # Books is a list of dictionaries
         total_books = min(len(books), 5)
         i = 0
         while i<total_books:
@@ -87,8 +90,11 @@ def main():
                 # Build the path to the cover image file
                 cover_path = os.path.join(cwd, "covers", f"{title}.jpg")
                 # Write the image to a file
-                with open(cover_path, "wb") as f:
-                    f.write(image)
+                if image is not None:
+                    with open(cover_path, "wb") as f:
+                        f.write(image)
+                else:
+                    print(f"Error: Could not retrieve cover image for '{title}'")
             i=i+1    
     else:
         print(f"Error: {response.status_code}")
