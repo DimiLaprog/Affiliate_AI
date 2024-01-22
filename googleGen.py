@@ -74,12 +74,12 @@ def main():
         i = 0
         while i<total_books:
             title = books[i]['volumeInfo']['title']
-            #author = books[i]['volumeInfo']['authors'][0]
+            author = books[i]['volumeInfo']['authors'][0]
             if title not in titles:
                 titles.add(title)
                 print(title)
                 print(title)
-                book_cover_url=google_images(title,google_key,cse_id)
+                book_cover_url=google_images(title + "by" + author,google_key,cse_id)
                 image=get_image(book_cover_url)
                 # Get the current working directory
                 cwd = os.getcwd()
