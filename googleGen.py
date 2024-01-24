@@ -1,8 +1,9 @@
 import requests
 import random
 import os
-from PIL import Image
 import urllib.parse
+from openai import OpenAI
+
 
 from googleapiclient.discovery import build
 
@@ -45,6 +46,22 @@ def main():
     # # Open the file and read the key for google images
     with open(google_key_file, "r") as f:
         google_key = f.read()
+        
+    # Read the OPENAI_API_KEY from the environment
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+
+    # Print the API key
+    print("API Key:", openai_api_key)
+    client = OpenAI()
+
+    completion = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "user", "content": "Compose a poem that explains the concept of recursion in programming."}
+    ]
+    )
+
+    print(completion.choices[0].message)
 
     # Print the API key and CSE ID
     print(api_key)
