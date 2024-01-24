@@ -10,7 +10,7 @@ from googleapiclient.discovery import build
 
 def google_images(query,key,cse_id):
     service = build("customsearch", "v1", developerKey=key)
-    res = service.cse().list(q=query+" book cover", cx=cse_id, searchType='image').execute()    
+    res = service.cse().list(q=query+" book front cover", cx=cse_id, searchType='image').execute()    
     #print(query+"book cover")
     return res['items'][0]['link']
 
@@ -91,12 +91,11 @@ def main():
         i = 0
         while i<total_books:
             title = books[i]['volumeInfo']['title']
-            author = books[i]['volumeInfo']['authors'][0]
+            #author = books[i]['volumeInfo']['authors'][0]
             if title not in titles:
-                titles.add(title)
                 print(title)
-                print(title)
-                book_cover_url=google_images(title + "by" + author,google_key,cse_id)
+
+                book_cover_url=google_images(title,google_key,cse_id)
                 image=get_image(book_cover_url)
                 # Get the current working directory
                 cwd = os.getcwd()
@@ -104,6 +103,8 @@ def main():
                 title = title.replace("/", "_")
                 title = title.replace(":", "_")
                 title = title.replace("?", "_")
+                print(title)
+                titles.add(title)
                 # Build the path to the cover image file
                 cover_path = os.path.join(cwd, "covers", f"{title}.jpg")
                 # Write the image to a file
@@ -112,6 +113,8 @@ def main():
                         f.write(image)
                 else:
                     print(f"Error: Could not retrieve cover image for '{title}'")
+                    titles.remove(title)
+                    i=i-1
             i=i+1    
     else:
         print(f"Error: {response.status_code}")
