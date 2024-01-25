@@ -124,6 +124,25 @@ def main():
     else:
         print(f"Error: {response.status_code}")
 
+    # Convert set to list
+    titles_list = list(titles)
+
+    voiceover_completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "user", "content": "Create a voiceover for a 30-second video."},
+            {"role": "assistant", "content": "Start with the question"+question+".Then, introduce a collection of"
+            +"thought-provoking books, each exploring different facets of the question. As you showcase the book titles of"+ 
+            ", ".join([f"{title}" for title in titles_list[:-1]]) + f", and [{titles_list[-1]}], weave a narrative that connects the books to the overarching theme."},
+            {"role": "assistant", "content": "In your output only include the voiceover words."}, 
+            {"role": "assistant", "content": "temperature=0.5"}        
+        ]
+    )
+
+    # Extract and print only the response text
+    voiceover_response_text = voiceover_completion.choices[0].message.content
+    print(voiceover_response_text)
+
 if __name__ == "__main__":
     main()
 
