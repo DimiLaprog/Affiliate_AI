@@ -55,24 +55,31 @@ def main():
     client = OpenAI()
 
     completion = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[
-        {"role": "user", "content": "Compose a poem that explains the concept of recursion in programming."}
-    ]
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "user", "content": "Come up with philosophical questions."},
+            {"role": "assistant", "content": "What is the true meaning of life?"},
+            {"role": "assistant", "content": "temperature=0.5\nmax_tokens=4"}        
+        ]
     )
 
-    print(completion.choices[0].message)
+    # Extract and print only the response text
+    response_text = completion.choices[0].message.content
+    print(response_text)
 
     # Print the API key and CSE ID
     print(api_key)
     print(cse_id)
 
-
+    # Split the response text into lines and filter out empty lines
+    questions_list = [line.strip() for line in response_text.splitlines() if line.strip()]
     questions = ["What is the meaning of life?", "What is the purpose of existence?", "Why are we here?", "What is the secret to happiness?", "What is the key to success?"]
 
     # Select a random question
-    question = random.choice(questions)
-
+    #question = random.choice(questions)
+    # Select a random question
+    question = random.choice(questions_list)
+    print(question)
     # Build the API endpoint URL for google Books API
     url = f"https://www.googleapis.com/books/v1/volumes?q={question}&key={api_key}"
 
@@ -100,9 +107,9 @@ def main():
                 # Get the current working directory
                 cwd = os.getcwd()
                 # Replace invalid characters in the title with underscores
-                title = title.replace("/", "_")
-                title = title.replace(":", "_")
-                title = title.replace("?", "_")
+                title = title.replace("/", "")
+                title = title.replace(":", "")
+                title = title.replace("?", "")
                 print(title)
                 titles.add(title)
                 # Build the path to the cover image file
