@@ -111,17 +111,15 @@ def main():
                 title = title.replace(":", "")
                 title = title.replace("?", "")
                 print(title)
-                titles.add(title)
                 # Build the path to the cover image file
                 cover_path = os.path.join(cwd, "covers", f"{title}.jpg")
                 # Write the image to a file
                 if image is not None:
+                    titles.add(title)
                     with open(cover_path, "wb") as f:
                         f.write(image)
                 else:
                     print(f"Error: Could not retrieve cover image for '{title}'")
-                    titles.remove(title)
-                    i=i-1
             i=i+1    
     else:
         print(f"Error: {response.status_code}")
