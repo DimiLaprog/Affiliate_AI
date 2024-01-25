@@ -59,7 +59,7 @@ def main():
         messages=[
             {"role": "user", "content": "Come up with philosophical questions."},
             {"role": "assistant", "content": "What is the true meaning of life?"},
-            {"role": "assistant", "content": "temperature=0.5\nmax_tokens=4"}        
+            {"role": "assistant", "content": "temperature=1\nmax_tokens=4"}        
         ]
     )
 
@@ -95,6 +95,10 @@ def main():
         books = data['items']
         # Books is a list of dictionaries
         total_books = min(len(books), 5)
+        # Get the current working directory
+        cwd = os.getcwd()
+        question_folder = os.path.join(cwd, "covers", question.replace("?", ""))
+        os.makedirs(question_folder, exist_ok=True)       
         i = 0
         while i<total_books:
             title = books[i]['volumeInfo']['title']
@@ -104,18 +108,16 @@ def main():
 
                 book_cover_url=google_images(title,google_key,cse_id)
                 image=get_image(book_cover_url)
-                # Get the current working directory
-                cwd = os.getcwd()
                 # Replace invalid characters in the title with underscores
                 title = title.replace("/", "")
                 title = title.replace(":", "")
                 title = title.replace("?", "")
                 print(title)
-                # Build the path to the cover image file
-                cover_path = os.path.join(cwd, "covers", f"{title}.jpg")
                 # Write the image to a file
                 if image is not None:
                     titles.add(title)
+                    # Build the path to the cover image file
+                    cover_path = os.path.join(question_folder, f"{title}.jpg")  
                     with open(cover_path, "wb") as f:
                         f.write(image)
                 else:
@@ -133,7 +135,7 @@ def main():
             {"role": "user", "content": "Create a voiceover for a 30-second video."},
             {"role": "assistant", "content": "Start with the question"+question+".Then, introduce a collection of"
             +"thought-provoking books, each exploring different facets of the question. As you showcase the book titles of"+ 
-            ", ".join([f"{title}" for title in titles_list[:-1]]) + f", and [{titles_list[-1]}], weave a narrative that connects the books to the overarching theme."},
+            ", ".join([f"{title}" for title in titles_list[:-1]]) + f", and {titles_list[-1]}, weave a narrative that connects the books to the overarching theme."},
             {"role": "assistant", "content": "In your output only include the voiceover words."}, 
             {"role": "assistant", "content": "temperature=0.5"}        
         ]
