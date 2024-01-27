@@ -4,7 +4,6 @@ import os
 import urllib.parse
 from openai import OpenAI
 
-
 from googleapiclient.discovery import build
 
 
@@ -58,8 +57,8 @@ def main():
         model="gpt-3.5-turbo",
         messages=[
             {"role": "user", "content": "Come up with philosophical questions."},
-            {"role": "assistant", "content": "What is the true meaning of life?"},
-            {"role": "assistant", "content": "temperature=1\nmax_tokens=4"}        
+            {"role": "system", "content": "What is the true meaning of life?"},
+            {"role": "system", "content": "temperature=1\nmax_tokens=4"}        
         ]
     )
 
@@ -112,6 +111,7 @@ def main():
                 title = title.replace("/", "")
                 title = title.replace(":", "")
                 title = title.replace("?", "")
+                title = title.replace("\"", "")
                 print(title)
                 # Write the image to a file
                 if image is not None:
@@ -136,14 +136,34 @@ def main():
             {"role": "assistant", "content": "Start with the question"+question+".Then, introduce a collection of"
             +"thought-provoking books, each exploring different facets of the question. As you showcase the book titles of"+ 
             ", ".join([f"{title}" for title in titles_list[:-1]]) + f", and {titles_list[-1]}, weave a narrative that connects the books to the overarching theme."},
-            {"role": "assistant", "content": "In your output only include the voiceover words."}, 
-            {"role": "assistant", "content": "temperature=0.5"}        
+            {"role": "assistant", "content": "Output should only include the voiceover words in a single string."}, 
+            {"role": "assistant", "content": "temperature=2"}        
         ]
     )
 
-    # Extract and print only the response text
+    # Extract only the response text
     voiceover_response_text = voiceover_completion.choices[0].message.content
     print(voiceover_response_text)
+    
+    voiceover_response_text_path = os.path.join(question_folder, "voiceover_response_text.txt")  
+    # Optional Step to write the response to a txt file.
+    # Open the file in write mode ('w')
+    with open(voiceover_response_text_path, 'w') as file:
+        # Write the string to the file
+        file.write(voiceover_response_text)
+    #print(type(voiceover_response_text))
+
+    speech_file_path = os.path.join(question_folder,question.replace("?", "")+"voiceover.mp3") 
+    voiceover_response = client.audio.speech.create(
+    model="tts-1",
+    voice="alloy",
+    input=voiceover_response_text
+    )
+    #print(voiceover_response)
+    #print(type(voiceover_response))
+    with open(speech_file_path, 'wb') as file:
+        file.write(voiceover_response.content)
+    #voiceover_response.stream_to_file(speech_file_path)
 
 if __name__ == "__main__":
     main()
