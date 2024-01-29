@@ -56,9 +56,9 @@ def main():
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "user", "content": "Come up with philosophical questions."},
+            {"role": "user", "content": "Come up with at least 10 philosophical questions."},
             {"role": "system", "content": "What is the true meaning of life?"},
-            {"role": "system", "content": "temperature=1\nmax_tokens=4"}        
+            {"role": "system", "content": "temperature=2\nmax_tokens=4"}        
         ]
     )
 
@@ -93,7 +93,7 @@ def main():
         # items is a field of dictionaries returned by the json format.
         books = data['items']
         # Books is a list of dictionaries
-        total_books = min(len(books), 5)
+        total_books = min(len(books), 3)
         # Get the current working directory
         cwd = os.getcwd()
         question_folder = os.path.join(cwd, "covers", question.replace("?", ""))
@@ -132,12 +132,16 @@ def main():
     voiceover_completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "user", "content": "Create a voiceover for a 30-second video."},
+            {"role": "user", "content": "Create a script for a 30-second video."},
             {"role": "assistant", "content": "Start with the question"+question+".Then, introduce a collection of"
             +"thought-provoking books, each exploring different facets of the question. As you showcase the book titles of"+ 
             ", ".join([f"{title}" for title in titles_list[:-1]]) + f", and {titles_list[-1]}, weave a narrative that connects the books to the overarching theme."},
-            {"role": "assistant", "content": "Output should only include the voiceover words in a single string."}, 
-            {"role": "assistant", "content": "temperature=2"}        
+            {"role": "assistant", "content": "Before introducing the next title, leave a gap so the viewer can absorb what you say about the previous book."
+             + "Fill the gaps with a narrative that connects the books to the overarching theme."},
+            {"role": "assistant", "content": "Output should only include the script words in a single string."},
+            {"role": "assistant", "content": "temperature=1\nfrequency_penalty=1"}
+
+
         ]
     )
 
@@ -152,8 +156,26 @@ def main():
         # Write the string to the file
         file.write(voiceover_response_text)
     #print(type(voiceover_response_text))
+        
+    hashtags_completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "user", "content": "For the following voiceover:"+voiceover_response_text+", provide hashtags that are space separated and suitable for Tik Tok."}  
+        ]
+    )
 
-    speech_file_path = os.path.join(question_folder,question.replace("?", "")+"voiceover.mp3") 
+    # Extract only the response text
+    tiktok_hashtags = hashtags_completion.choices[0].message.content
+    print(tiktok_hashtags)
+    
+    tiktok_hashtags_path = os.path.join(question_folder, "tiktok_hashtags.txt")  
+    # Optional Step to write the response to a txt file.
+    # Open the file in write mode ('w')
+    with open(tiktok_hashtags_path, 'w') as file:
+        # Write the string to the file
+        file.write(tiktok_hashtags)
+
+    speech_file_path = os.path.join(question_folder,question.replace("?", "")+"_voiceover.mp3") 
     voiceover_response = client.audio.speech.create(
     model="tts-1",
     voice="alloy",
