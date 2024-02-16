@@ -56,8 +56,9 @@ def main():
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "user", "content": "Come up with at least 10 philosophical questions."},
-            {"role": "system", "content": "What is the true meaning of life?"},
+            {"role": "user", "content": "Come up with philosophical questions."},
+            {"role": "assistant", "content": "What is the true meaning of life?\nWhat is the secret to happiness?"},
+            {"role": "user", "content": "Come up with philosophical questions."},
             {"role": "system", "content": "temperature=2\nmax_tokens=4"}        
         ]
     )
@@ -133,13 +134,13 @@ def main():
         model="gpt-3.5-turbo",
         messages=[
             {"role": "user", "content": "Create a script for a 30-second video."},
-            {"role": "assistant", "content": "Start with the question"+question+".Then, introduce a collection of"
+            {"role": "user", "content": "Start with the question"+question+".Then, introduce a collection of"
             +"thought-provoking books, each exploring different facets of the question. As you showcase the book titles of"+ 
-            ", ".join([f"{title}" for title in titles_list[:-1]]) + f", and {titles_list[-1]}, weave a narrative that connects the books to the overarching theme."},
-            {"role": "assistant", "content": "Before introducing the next title, leave a gap so the viewer can absorb what you say about the previous book."
-             + "Fill the gaps with a narrative that connects the books to the overarching theme."},
-            {"role": "assistant", "content": "Output should only include the script words in a single string."},
-            {"role": "assistant", "content": "temperature=1\nfrequency_penalty=1"}
+            ", ".join([f"{title}" for title in titles_list[:-1]]) + f", and {titles_list[-1]}, make the script in a way that connects the books to the overarching theme."},
+            {"role": "user", "content": "Before introducing the next title, leave a gap so the viewer can absorb what you say about the previous book."
+             + "Fill the gaps with a script that connects the books to the overarching theme."},
+            {"role": "user", "content": "Output should only include the script words in a single string."},
+            {"role": "system", "content": "temperature=2\nfrequency_penalty=1"}
 
 
         ]
